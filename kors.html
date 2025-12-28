@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>المنصة التعليمية - نظام التفعيل</title>
+  <title>المنصة التعليمية - لوحة التحكم</title>
   
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -46,8 +46,8 @@
 
   <div id="lock-screen">
     <div class="lock-box">
-      <h2 style="color: #d4af37;">مرحباً بك</h2>
-      <p>برجاء إدخال كود التفعيل للوصول للمحاضرات</p>
+      <h2 style="color: #d4af37;">دخول الطلاب</h2>
+      <p>ادخل كود الاشتراك الخاص بك للمتابعة</p>
       <input type="text" id="pass-input" placeholder="ادخل الكود هنا">
       <br>
       <button id="pass-btn" onclick="validatePass()">تفعيل الآن</button>
@@ -64,7 +64,6 @@
   <div id="contentExams" class="content" style="display:none;"></div>
 
   <script>
-    // --- إعدادات Firebase المحدثة ---
     const firebaseConfig = {
       apiKey: "AIzaSyDR0P95U7O-6lzoCkYWrXH1pKmDEFRJh0",
       authDomain: "password-cd32b.firebaseapp.com",
@@ -78,63 +77,68 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
+    // فحص الحالة عند فتح الصفحة (نظام الطرد)
+    window.onload = async function() {
+      const savedCode = localStorage.getItem('userCode_v5');
+      
+      if (savedCode) {
+        try {
+          const snapshot = await database.ref('codes/' + savedCode).once('value');
+          const status = snapshot.val();
+
+          // لو الكود اتمسح من فيربيز أو مابقاش used، اقفل الموقع
+          if (status === "used") {
+            document.getElementById('lock-screen').style.display = 'none';
+          } else {
+            localStorage.removeItem('userCode_v5');
+            document.getElementById('lock-screen').style.display = 'flex';
+          }
+        } catch (err) {
+          console.error("خطأ في الاتصال");
+        }
+      }
+      renderNotes(contentLectures, lectures, "لا توجد محاضرات حالياً", "lecture");
+      renderNotes(contentExams, exams, "لا توجد امتحانات حالياً", "exam");
+    };
+
     async function validatePass() {
-      // trim لحذف المسافات و toLowerCase لتوحيد حالة الأحرف
       const input = document.getElementById('pass-input').value.trim().toLowerCase();
       const error = document.getElementById('error-msg');
       const btn = document.getElementById('pass-btn');
 
-      if (!input) {
-        error.innerText = "يرجى كتابة الكود أولاً";
-        return;
-      }
-
+      if (!input) return;
       btn.innerText = "جاري التحقق...";
       btn.disabled = true;
-      error.innerText = "";
 
       try {
-        // البحث عن الكود في مسار codes/كود_الطالب
         const snapshot = await database.ref('codes/' + input).once('value');
         const status = snapshot.val();
 
         if (status === "active") {
-          // إذا كان متاحاً، نحوله إلى مستخدم فوراً
           await database.ref('codes/' + input).set("used");
-          localStorage.setItem('isUnlocked_v4', 'true'); // مفتاح جديد لتصفير الجميع
+          localStorage.setItem('userCode_v5', input); // تخزين الكود للتحقق المستمر
           document.getElementById('lock-screen').style.display = 'none';
         } else if (status === "used") {
-          error.innerText = "هذا الكود تم استخدامه من قبل جهاز آخر!";
+          error.innerText = "هذا الكود مستخدم من قبل!";
         } else {
-          error.innerText = "كود التفعيل غير صحيح!";
+          error.innerText = "الكود غير صحيح!";
         }
       } catch (err) {
-        console.error(err);
-        error.innerText = "خطأ في الاتصال، تأكد من الإنترنت!";
+        error.innerText = "خطأ في الشبكة!";
       } finally {
         btn.innerText = "تفعيل الآن";
         btn.disabled = false;
       }
     }
 
-    // فحص حالة الدخول عند تحميل الصفحة
-    window.onload = function() {
-      if (localStorage.getItem('isUnlocked_v4') === 'true') {
-        document.getElementById('lock-screen').style.display = 'none';
-      }
-      renderNotes(contentLectures, lectures, "لا توجد محاضرات متاحة حالياً", "lecture");
-      renderNotes(contentExams, exams, "لا توجد امتحانات متاحة حالياً", "exam");
-    };
-
-    // --- بيانات المحتوى (عدلها كما تشاء) ---
+    // --- البيانات والمحتوى ---
     const lectures = [
-      { title: "المحاضرة الأولى: مقدمة", url: "فديوهات/video1.mp4" },
+      { title: "المحاضرة الأولى", url: "فديوهات/video1.mp4" },
     ];
     const exams = [
-      { title: "اختبار تجريبي", url: "مذكرات/test.pdf" },
+      { title: "امتحان الشهر", url: "مذكرات/test.pdf" },
     ];
 
-    // --- وظائف العرض والتبديل ---
     const tabLectures = document.getElementById('tabLectures');
     const tabExams = document.getElementById('tabExams');
     const contentLectures = document.getElementById('contentLectures');
@@ -163,7 +167,6 @@
       tabLectures.classList.add('active'); tabExams.classList.remove('active');
       contentLectures.style.display = 'flex'; contentExams.style.display = 'none';
     });
-
     tabExams.addEventListener('click', () => {
       tabExams.classList.add('active'); tabLectures.classList.remove('active');
       contentExams.style.display = 'flex'; contentLectures.style.display = 'none';
