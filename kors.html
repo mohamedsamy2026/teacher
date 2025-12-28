@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>المحاضرات والامتحانات</title>
   <style>
+    /* الكود الخاص بك كما هو تماماً */
     body {
       background-color: #0f1117;
       color: white;
@@ -62,7 +63,7 @@
       background: #1a1c22;
       border-radius: 12px;
       padding: 15px;
-      width: calc(33.33% - 20px); /* 3 عناصر في الصف مع gap */
+      width: calc(33.33% - 20px); 
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -94,20 +95,64 @@
       margin-bottom: 10px;
     }
 
-    /* Media Queries لتغيير عدد العناصر في الصف حسب الشاشة */
+    /* --- شاشة القفل --- */
+    #lock-screen {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: #0f1117;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    .lock-box {
+      background: #1a1c22;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+    #pass-input {
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #d4af37;
+      background: #0f1117;
+      color: white;
+      margin-bottom: 15px;
+      width: 200px;
+      text-align: center;
+    }
+    #pass-btn {
+      padding: 10px 25px;
+      background: #d4af37;
+      border: none;
+      border-radius: 5px;
+      color: #0f1117;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
     @media screen and (max-width: 900px) {
-      .note-item {
-        width: calc(50% - 20px); /* 2 عنصر في الصف */
-      }
+      .note-item { width: calc(50% - 20px); }
     }
     @media screen and (max-width: 600px) {
-      .note-item {
-        width: 100%; /* عنصر واحد في الصف */
-      }
+      .note-item { width: 100%; }
     }
   </style>
 </head>
 <body>
+
+  <div id="lock-screen">
+    <div class="lock-box">
+      <h2>محتوى محمي</h2>
+      <p>أدخل كود التفعيل الخاص بك</p>
+      <input type="password" id="pass-input" placeholder="ادخل الكود هنا">
+      <br>
+      <button id="pass-btn" onclick="validatePass()">تفعيل</button>
+      <p id="error-msg" style="color: red; margin-top: 10px;"></p>
+    </div>
+  </div>
 
   <div class="tabs">
     <div id="tabLectures" class="tab active">المحاضرات</div>
@@ -118,15 +163,43 @@
   <div id="contentExams" class="content" style="display:none;"></div>
 
   <script>
+    // --- مصفوفة كلمات السر (تقدر تضيف العدد اللي تحبه) ---
+    let VALID_CODES = ["Wafi01", "Wafi02", "Wafi03", "Wafi04"];
+
+    function validatePass() {
+      const input = document.getElementById('pass-input').value;
+      const error = document.getElementById('error-msg');
+      
+      // البحث عن الكود في المصفوفة
+      const codeIndex = VALID_CODES.indexOf(input);
+
+      if (codeIndex !== -1) {
+        // إذا الكود صح:
+        localStorage.setItem('isUnlocked', 'true'); // تذكر الجهاز
+        
+        // حذف الكود المستخدم من المصفوفة فوراً حتى لا يعمل مرة أخرى في الجلسة الحالية
+        VALID_CODES.splice(codeIndex, 1); 
+        
+        document.getElementById('lock-screen').style.display = 'none';
+      } else {
+        error.innerText = "هذا الكود غير صحيح أو تم استخدامه مسبقاً!";
+      }
+    }
+
+    // التحقق التلقائي عند فتح الصفحة
+    window.onload = function() {
+      if (localStorage.getItem('isUnlocked') === 'true') {
+        document.getElementById('lock-screen').style.display = 'none';
+      }
+    };
+
+    // --- كودك الأصلي كما هو ---
     const lectures = [
-      // { title: "محاضرة الرياضيات", url: "فديوهات/responsive dashboard using html and css only _ تصميم لوحة تحكم متجاوبة(720P_HD).mp4" },
-
-
+      { title: "محاضرة الرياضيات", url: "فديوهات/responsive dashboard using html and css only _ تصميم لوحة تحكم متجاوبة(720P_HD).mp4" },
     ];
 
     const exams = [
-      // { title: "امتحان الوحدة الأولى", url: "مذكرات/اول درس رياضه.pdf" },
-
+      { title: "امتحان الوحدة الأولى", url: "مذكرات/اول درس رياضه.pdf" },
     ];
 
     const tabLectures = document.getElementById('tabLectures');
