@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>المذكرات</title>
+  <style>
+    body {
+      background-color: #0f1117;
+      color: white;
+      font-family: 'Cairo', sans-serif;
+      margin: 0; padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .empty-state {
+      text-align: center;
+      margin-top: 50px;
+    }
+    .empty-state img {
+      width: 150px;
+      opacity: 0.6;
+      margin-bottom: 20px;
+    }
+    .empty-state h2 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    .empty-state p {
+      color: #8b9aa7;
+      font-size: 16px;
+    }
+    .notes-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 30px;
+      width: 100%;
+      max-width: 800px;
+    }
+    .note-item {
+      background: #1a1c22;
+      border-radius: 12px;
+      padding: 30px;
+      margin: 10px;
+      width: 180px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      text-decoration: none;
+      color: white;
+      box-shadow: 0 0 8px #333;
+      transition: transform 0.2s ease;
+    }
+    .note-item:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #516951;
+    }
+    .note-icon {
+      width: 80px;
+      margin-bottom: 15px;
+    }
+    .note-title {
+      font-weight: bold;
+      font-size: 18px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="noNotes" class="empty-state" style="display:none;">
+    <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="مذكرة">
+    <h2>لا توجد مذكرات متاحة</h2>
+    <p>سيتم إضافة المذكرات قريبًا</p>
+  </div>
+
+  <div id="notesContainer" class="notes-list" style="display:none;">
+  </div>
+
+  <script>
+    const notes = [
+      // { title: "مذكرة الوحدة الأولى", url: "مذكرات/اول درس رياضه.pdf" },
+
+    ];
+
+    const notesContainer = document.getElementById('notesContainer');
+    const noNotes = document.getElementById('noNotes');
+
+    if(notes.length === 0) {
+      noNotes.style.display = 'block';
+      notesContainer.style.display = 'none';
+    } else {
+      noNotes.style.display = 'none';
+      notesContainer.style.display = 'flex';
+
+      notes.forEach(note => {
+        const a = document.createElement('a'); // استعادة الرابط
+        a.href = note.url;                     // رابط PDF
+        a.className = "note-item";
+        a.innerHTML = `
+          <img class="note-icon" src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="pdf icon">
+          <div class="note-title">${note.title}</div>
+        `;
+        notesContainer.appendChild(a);
+      });
+    }
+  </script>
+
+</body>
+</html>

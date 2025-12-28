@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>المحاضرات والامتحانات</title>
+  <style>
+    body {
+      background-color: #0f1117;
+      color: white;
+      font-family: 'Cairo', sans-serif;
+      margin: 0; padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .tabs {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+      cursor: pointer;
+    }
+    .tab {
+      padding: 10px 20px;
+      border-bottom: 3px solid transparent;
+      font-weight: bold;
+      color: #aaa;
+      transition: color 0.3s, border-color 0.3s;
+    }
+    .tab.active {
+      border-color: #d4af37;
+      color: white;
+    }
+    .content {
+      width: 100%;
+      max-width: 1000px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+    .empty-state {
+      text-align: center;
+      margin-top: 50px;
+      width: 100%;
+    }
+    .empty-state img {
+      width: 80px;
+      opacity: 0.7;
+      margin-bottom: 20px;
+    }
+    .empty-state h2 {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+    .empty-state p {
+      color: #8b9aa7;
+      font-size: 14px;
+    }
+    .note-item {
+      background: #1a1c22;
+      border-radius: 12px;
+      padding: 15px;
+      width: calc(33.33% - 20px); /* 3 عناصر في الصف مع gap */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      text-decoration: none;
+      color: white;
+      box-shadow: 0 0 8px #333;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      margin: 20px;
+    }
+    .note-item:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 15px #d4af37;
+    }
+    .note-title {
+      font-weight: bold;
+      font-size: 16px;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    video {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      background: black;
+    }
+    .note-icon {
+      width: 50px;
+      margin-bottom: 10px;
+    }
+
+    /* Media Queries لتغيير عدد العناصر في الصف حسب الشاشة */
+    @media screen and (max-width: 900px) {
+      .note-item {
+        width: calc(50% - 20px); /* 2 عنصر في الصف */
+      }
+    }
+    @media screen and (max-width: 600px) {
+      .note-item {
+        width: 100%; /* عنصر واحد في الصف */
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="tabs">
+    <div id="tabLectures" class="tab active">المحاضرات</div>
+    <div id="tabExams" class="tab">الامتحانات</div>
+  </div>
+
+  <div id="contentLectures" class="content"></div>
+  <div id="contentExams" class="content" style="display:none;"></div>
+
+  <script>
+    const lectures = [
+      // { title: "محاضرة الرياضيات", url: "فديوهات/responsive dashboard using html and css only _ تصميم لوحة تحكم متجاوبة(720P_HD).mp4" },
+
+
+    ];
+
+    const exams = [
+      // { title: "امتحان الوحدة الأولى", url: "مذكرات/اول درس رياضه.pdf" },
+
+    ];
+
+    const tabLectures = document.getElementById('tabLectures');
+    const tabExams = document.getElementById('tabExams');
+    const contentLectures = document.getElementById('contentLectures');
+    const contentExams = document.getElementById('contentExams');
+
+    function createLectureItem(note) {
+      const div = document.createElement('div');
+      div.className = "note-item";
+      div.innerHTML = `
+        <div class="note-title">${note.title}</div>
+        <video controls>
+          <source src="${note.url}" type="video/mp4">
+          المتصفح لا يدعم عرض الفيديو.
+        </video>
+      `;
+      return div;
+    }
+
+    function createExamItem(note) {
+      const a = document.createElement('a');
+      a.href = note.url;
+      a.target = "_blank";
+      a.className = "note-item";
+      a.innerHTML = `
+        <img class="note-icon" src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="pdf icon">
+        <div class="note-title">${note.title}</div>
+      `;
+      return a;
+    }
+
+    function renderNotes(container, notesArray, emptyMessage, type="lecture") {
+      container.innerHTML = "";
+      if(notesArray.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="مذكرة">
+            <h2>${emptyMessage}</h2>
+            <p>سيتم إضافة المحتوى قريبًا</p>
+          </div>
+        `;
+      } else {
+        notesArray.forEach(note => {
+          if(type === "lecture") container.appendChild(createLectureItem(note));
+          else container.appendChild(createExamItem(note));
+        });
+      }
+    }
+
+    tabLectures.addEventListener('click', () => {
+      tabLectures.classList.add('active');
+      tabExams.classList.remove('active');
+      contentLectures.style.display = 'flex';
+      contentExams.style.display = 'none';
+    });
+
+    tabExams.addEventListener('click', () => {
+      tabExams.classList.add('active');
+      tabLectures.classList.remove('active');
+      contentExams.style.display = 'flex';
+      contentLectures.style.display = 'none';
+    });
+
+    renderNotes(contentLectures, lectures, "لا توجد محاضرات متاحة", "lecture");
+    renderNotes(contentExams, exams, "لا توجد امتحانات متاحة", "exam");
+  </script>
+
+</body>
+</html>
