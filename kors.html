@@ -4,8 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>المحاضرات والامتحانات</title>
+  
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
   <style>
-    /* الكود الخاص بك كما هو تماماً */
+    /* الكود الخاص بك كما هو تماماً دون أي تغيير */
     body {
       background-color: #0f1117;
       color: white;
@@ -95,7 +99,6 @@
       margin-bottom: 10px;
     }
 
-    /* --- شاشة القفل --- */
     #lock-screen {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -163,26 +166,54 @@
   <div id="contentExams" class="content" style="display:none;"></div>
 
   <script>
-    // --- مصفوفة كلمات السر (تقدر تضيف العدد اللي تحبه) ---
-    let VALID_CODES = ["Wafi01", "Wafi02", "Wafi03", "Wafi04"];
+    // --- إعدادات Firebase الخاصة بك كما في الصورة ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyDR0P95U7O-6lzoCkYWrXH1pKmDEFRJh0",
+      authDomain: "password-cd32b.firebaseapp.com",
+      databaseURL: "https://password-cd32b-default-rtdb.firebaseio.com",
+      projectId: "password-cd32b",
+      storageBucket: "password-cd32b.firebasestorage.app",
+      messagingSenderId: "26391483654",
+      appId: "1:26391483654:web:a9985e0feee2b519fe7a87",
+      measurementId: "G-BEKFRKCZRS"
+    };
 
-    function validatePass() {
-      const input = document.getElementById('pass-input').value;
+    // تهيئة Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // وظيفة التحقق المعدلة للعمل مع قاعدة البيانات
+    async function validatePass() {
+      const input = document.getElementById('pass-input').value.trim();
       const error = document.getElementById('error-msg');
-      
-      // البحث عن الكود في المصفوفة
-      const codeIndex = VALID_CODES.indexOf(input);
+      const btn = document.getElementById('pass-btn');
 
-      if (codeIndex !== -1) {
-        // إذا الكود صح:
-        localStorage.setItem('isUnlocked', 'true'); // تذكر الجهاز
-        
-        // حذف الكود المستخدم من المصفوفة فوراً حتى لا يعمل مرة أخرى في الجلسة الحالية
-        VALID_CODES.splice(codeIndex, 1); 
-        
-        document.getElementById('lock-screen').style.display = 'none';
-      } else {
-        error.innerText = "هذا الكود غير صحيح أو تم استخدامه مسبقاً!";
+      if (!input) return;
+
+      btn.innerText = "جاري التحقق...";
+      btn.disabled = true;
+
+      try {
+        // التحقق من وجود الكود وحالته في Firebase
+        const snapshot = await database.ref('codes/' + input).once('value');
+        const status = snapshot.val();
+
+        if (status === "active") {
+          // الكود صحيح وغير مستخدم: اجعله "مستخدماً" فوراً
+          await database.ref('codes/' + input).set("used");
+          
+          localStorage.setItem('isUnlocked', 'true'); // تذكر الجهاز
+          document.getElementById('lock-screen').style.display = 'none';
+        } else if (status === "used") {
+          error.innerText = "هذا الكود تم استخدامه مسبقاً من جهاز آخر!";
+        } else {
+          error.innerText = "هذا الكود غير صحيح!";
+        }
+      } catch (err) {
+        error.innerText = "خطأ في الاتصال، حاول مرة أخرى.";
+      } finally {
+        btn.innerText = "تفعيل";
+        btn.disabled = false;
       }
     }
 
@@ -191,9 +222,12 @@
       if (localStorage.getItem('isUnlocked') === 'true') {
         document.getElementById('lock-screen').style.display = 'none';
       }
+      // رندر المحتوى الأصلي
+      renderNotes(contentLectures, lectures, "لا توجد محاضرات متاحة", "lecture");
+      renderNotes(contentExams, exams, "لا توجد امتحانات متاحة", "exam");
     };
 
-    // --- كودك الأصلي كما هو ---
+    // --- بقية كودك الأصلي كما هو تماماً لضمان عدم تغير الشكل ---
     const lectures = [
       { title: "محاضرة الرياضيات", url: "فديوهات/responsive dashboard using html and css only _ تصميم لوحة تحكم متجاوبة(720P_HD).mp4" },
     ];
@@ -212,7 +246,7 @@
       div.className = "note-item";
       div.innerHTML = `
         <div class="note-title">${note.title}</div>
-        <video controls>
+        <video controls controlsList="nodownload">
           <source src="${note.url}" type="video/mp4">
           المتصفح لا يدعم عرض الفيديو.
         </video>
@@ -263,9 +297,6 @@
       contentExams.style.display = 'flex';
       contentLectures.style.display = 'none';
     });
-
-    renderNotes(contentLectures, lectures, "لا توجد محاضرات متاحة", "lecture");
-    renderNotes(contentExams, exams, "لا توجد امتحانات متاحة", "exam");
   </script>
 
 </body>
