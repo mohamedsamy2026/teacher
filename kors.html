@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منصة التعليم الاحترافية</title>
+  
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <style>
+    body {
+      background-color: #0f1117;
+      color: white;
+      font-family: 'Cairo', sans-serif;
+      margin: 0; padding: 20px;
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .tabs { display: flex; gap: 20px; margin-bottom: 30px; cursor: pointer; }
+    .tab { padding: 10px 20px; border-bottom: 3px solid transparent; font-weight: bold; color: #aaa; transition: 0.3s; }
+    .tab.active { border-color: #d4af37; color: white; }
+    .content { width: 100%; max-width: 1000px; display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+    .note-item { background: #1a1c22; border-radius: 12px; padding: 15px; width: calc(33.33% - 20px); display: flex; flex-direction: column; align-items: center; text-decoration: none; color: white; box-shadow: 0 0 8px #333; transition: 0.2s; margin: 10px; }
+    .note-title { font-weight: bold; font-size: 16px; text-align: center; margin-bottom: 15px; }
+    
+    /* شاشة القفل */
+    #lock-screen {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #0f1117; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; z-index: 9999;
+    }
+    .lock-box { background: #1a1c22; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 0 20px rgba(0,0,0,0.5); width: 90%; max-width: 400px; }
+    #pass-input { padding: 12px; border-radius: 8px; border: 1px solid #d4af37; background: #0f1117; color: white; margin-bottom: 15px; width: 80%; text-align: center; font-size: 18px; }
+    #pass-btn { padding: 10px 30px; background: #d4af37; border: none; border-radius: 8px; color: #0f1117; font-weight: bold; cursor: pointer; font-size: 16px; }
+
+    @media screen and (max-width: 900px) { .note-item { width: calc(50% - 20px); } }
+    @media screen and (max-width: 600px) { .note-item { width: 100%; } }
+  </style>
+</head>
+<body>
+
+  <div id="lock-screen">
+    <div class="lock-box">
+      <h2 style="color: #d4af37;">دخول الطلاب</h2>
+      <p>ادخل كود الاشتراك للمتابعة</p>
+      <input type="text" id="pass-input" placeholder="ادخل الكود هنا">
+      <br>
+      <button id="pass-btn" onclick="validatePass()">تفعيل الآن</button>
+      <p id="error-msg" style="color: #ff4d4d; margin-top: 15px;"></p>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div id="tabLectures" class="tab active">المحاضرات</div>
+    <div id="tabExams" class="tab">الامتحانات</div>
+  </div>
+
+  <div id="contentLectures" class="content"></div>
+  <div id="contentExams" class="content" style="display:none;"></div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDR0P95U7O-6lzoCkYWrXH1pKmDEFRJh0",
+      authDomain: "password-cd32b.firebaseapp.com",
+      databaseURL: "https://password-cd32b-default-rtdb.firebaseio.com",
+      projectId: "password-cd32b",
+      storageBucket: "password-cd32b.firebasestorage.app",
+      messagingSenderId: "26391483654",
+      appId: "1:26391483654:web:a9985e0feee2b519fe7a87"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // التحقق المستمر عند فتح الصفحة
+    window.onload = async function() {
+      const savedCode = localStorage.getItem('userCode_vFinal');
+      if (savedCode) {
+        try {
+          const snapshot = await database.ref('codes/' + savedCode).once('value');
+          if (snapshot.val() === "used") {
+            document.getElementById('lock-screen').style.display = 'none';
+          } else {
+            localStorage.removeItem('userCode_vFinal');
+            document.getElementById('lock-screen').style.display = 'flex';
+          }
+        } catch (err) { console.error("خطأ اتصال"); }
+      }
+      renderNotes();
+    };
+
+    async function validatePass() {
+      const input = document.getElementById('pass-input').value.trim().toLowerCase();
+      const error = document.getElementById('error-msg');
+      if (!input) return;
+
+      try {
+        const snapshot = await database.ref('codes/' + input).once('value');
+        const status = snapshot.val();
+        if (status === "active") {
+          await database.ref('codes/' + input).set("used");
+          localStorage.setItem('userCode_vFinal', input);
+          document.getElementById('lock-screen').style.display = 'none';
+        } else {
+          error.innerText = status === "used" ? "هذا الكود مستخدم!" : "الكود غير صحيح!";
+        }
+      } catch (err) { error.innerText = "فشل التحقق"; }
+    }
+
+    // --- الفيديوهات والامتحانات ---
+    const lectures = [
+      { title: "المحاضرة الأولى", url: "https://www.youtube.com/embed/VIDEO_ID_HERE" },
+    ];
+    const exams = [
+      { title: "اختبار تجريبي", url: "رابط_الملف_هنا.pdf" },
+    ];
+
+    function renderNotes() {
+      // رندر المحاضرات
+      const contentLectures = document.getElementById('contentLectures');
+      contentLectures.innerHTML = "";
+      lectures.forEach(lecture => {
+        const div = document.createElement('div');
+        div.className = "note-item";
+        div.innerHTML = `
+          <div class="note-title">${lecture.title}</div>
+          <div style="position:relative; width:100%; padding-top:56.25%; background:#000; border-radius:12px; overflow:hidden;">
+            <iframe style="position:absolute; top:0; left:0; width:100%; height:100%;" 
+                    src="${lecture.url}?rel=0&modestbranding=1&showinfo=0" frameborder="0" allowfullscreen></iframe>
+            <div style="position:absolute; top:0; left:0; width:100%; height:85%; z-index:10; background:transparent;"></div>
+          </div>`;
+        contentLectures.appendChild(div);
+      });
+
+      // رندر الامتحانات
+      const contentExams = document.getElementById('contentExams');
+      contentExams.innerHTML = "";
+      exams.forEach(exam => {
+        const a = document.createElement('a');
+        a.className = "note-item"; a.href = exam.url; a.target = "_blank";
+        a.innerHTML = `<img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" width="50"><div class="note-title">${exam.title}</div>`;
+        contentExams.appendChild(a);
+      });
+    }
+
+    // تبديل التبويبات
+    document.getElementById('tabLectures').onclick = function() {
+      this.classList.add('active'); document.getElementById('tabExams').classList.remove('active');
+      document.getElementById('contentLectures').style.display = 'flex';
+      document.getElementById('contentExams').style.display = 'none';
+    };
+    document.getElementById('tabExams').onclick = function() {
+      this.classList.add('active'); document.getElementById('tabLectures').classList.remove('active');
+      document.getElementById('contentExams').style.display = 'flex';
+      document.getElementById('contentLectures').style.display = 'none';
+    };
+  </script>
+</body>
+</html>

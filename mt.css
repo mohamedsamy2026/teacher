@@ -1,0 +1,603 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+:root{
+  --bg-start:#1fa2ff;
+  --bg-end:#233e73;
+  --text:#ffffff;
+}
+
+body {
+  background: linear-gradient(135deg,var(--bg-start),var(--bg-end));
+  color: var(--text);
+  font-family: 'Segoe UI', sans-serif;
+  color: white;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.8s ease, color 0.8s ease; /* السحر هنا */
+}
+
+body.dark-mode {
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: white;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+
+
+}
+
+
+
+.imge {
+  position: relative;
+  width: 150px;
+  margin-right: 700px;
+  margin-bottom: 150px;
+  border-radius: 50%;
+  transition: .5s;
+
+}
+.imge:hover {
+  transform: scale(1.08);
+  box-shadow: 1px 2px 12px rgb(4, 42, 47);
+}
+
+/* اسم + زرار الليل والنهار */
+.b {
+  display: flex;
+  font-style: italic;
+  color: rgb(255, 255, 255);
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  padding: 10px;
+}
+
+.n a {
+  margin-left: 480px;
+  margin-right: 150px;
+  font-size: 30px;
+  color: rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
+}
+
+
+.n a:hover{
+  background-color: rgb(206, 228, 118);
+}
+
+#m {
+  background-color: rgb(11, 120, 66);
+  border-radius: 30px;
+  padding: 10px;
+}
+
+/* شكل السويتش */
+.toggle-switch {
+  position: relative;
+  width: 90px;
+  height: 30px;
+  background: #203f4b;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  cursor: pointer;
+  transition: background 0.7s ease;
+}
+.toggle-switch i {
+  font-size: 14px;
+  color: #fff;
+  z-index: 2;
+}
+.toggle-switch .slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  background: #05a83e;
+  border-radius: 50%;
+  transition: transform 0.7s ease;
+}
+.toggle-switch.active {
+  background: #103363;
+}
+.toggle-switch.active .slider {
+  transform: translateX(61px);
+}
+
+/* شريط الترويسة */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+nav h2 {
+  font-size: 24px;
+  font-weight: bold;
+}
+nav ul {
+  display: flex;
+  list-style: none;
+  gap: 1rem;
+  position: relative;
+  top: 20px;
+}
+nav ul li a {
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+  background-color: #00ffc8;
+  border-radius: 10px;
+  transition: 0.3s;
+  padding: 1rem 2rem;
+}
+nav ul li a:hover {
+  background-color: #00d3a8;
+}
+
+/* محتوى الصفحة */
+.content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem;
+  gap: 1.5rem;
+}
+
+/* الصورة */
+.image-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  bottom: 170px;
+}
+.image-wrapper img {
+  width: 270px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid #fff;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+  position: relative;
+  margin-top:-100px;
+}
+.image-wrapper img:hover {
+  transform: scale(1.1);
+}
+.label {
+  margin-top: 10px;
+  font-size: 50px;
+  font-weight: bold;
+  color: rgb(223, 220, 6);
+}
+
+/* النص */
+.content-text h1 {
+  font-size: 36px;
+  font-weight: bold;
+  margin: 15px;
+}
+.content-text p {
+  font-size: 20px;
+  line-height: 1.6;
+  color: #000;
+  margin: 15px;
+}
+
+/* أيقونات التواصل */
+.soical {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+.soical a {
+  font-size: 20px;
+  padding: 10px;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  transition: 0.3s;
+}
+.soical a:nth-child(1) { background-color: #0fad21; }
+.soical a:nth-child(2) { background-color: #1431d7; }
+.soical a:nth-child(3) { background-color: #0088cc; }
+.soical a:hover { opacity: 0.8; }
+
+/* الوضع الداكن */
+.dark-mode {
+  background: linear-gradient(135deg, #000428, #004e92);
+  color: white;
+}
+
+/* معلومات إضافية */
+.extra-info {
+  display: none;
+  background: #222;
+  color: #eee;
+  padding: 30px;
+  font-weight: bold;
+  border-radius: 30px;
+  max-width: 90%;
+  margin: 60px auto 0;
+  text-align: center;
+}
+
+.info-item {
+  background: #333;
+  margin: 10px auto;
+  padding: 15px;
+  border-radius: 12px;
+  max-width: 400px;
+  font-size: 18px;
+}
+
+.booking-cta {
+  margin-top: 20px;
+}
+
+.booking-btn {
+  display: inline-block;
+  background: #23ab8e;
+  color: #fff;
+  padding: 12px 25px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+
+
+.booking-btn:hover {
+  background: #1a8670;
+}
+
+
+.booking-btn:hover {
+  background: #1a8670;
+}
+
+
+.info-item {
+  margin-bottom: 30px;
+  font-size: 16px;
+}
+.booking-cta a {
+  display: inline-block;
+  background: #cda851;
+  color: #121212;
+  padding: 10px 15px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  margin-top: 10px;
+  transition: background 0.3s ease;
+  cursor: pointer;
+}
+.booking-cta a:hover {
+  background: #b89239;
+}
+
+/* العناوين */
+.text-primary {
+  background-color: rgb(13, 99, 148);
+  padding: 10px;
+  margin-top: 20px;
+  border-radius: 10px;
+  border-bottom: 10px solid rgb(36, 132, 9);
+}
+
+.section-divider {
+  border: none;
+  height: 8px;
+  background: #94c10b;
+  margin: 20px auto;
+  width: 100%;
+  border-radius: 50px;
+}
+
+
+
+.sectio-divider {
+  display: none;
+  border: none;
+  height: 8px;
+  background: #94c10b;
+  margin: 20px auto;
+  width: 100%;
+  border-radius: 50px;
+}
+
+
+
+
+
+
+.section {
+  border: none;
+  height: 8px;
+  background: #b5770b;
+  margin: 30px auto;
+  width: 200px;
+  border-radius: 50px;
+}
+
+.booking-cta a {
+  position: relative;
+  z-index: 10;
+}
+
+#Portfolio h2 {
+  text-align: center;
+}
+
+/* قسم البورتفوليو */
+#Portfolio {
+  background-color: var(--primary-color);
+}
+#Portfolio .row {
+  border-radius: 10px;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 4rem;
+}
+#Portfolio .row .item {
+  background-color: white;
+  border-radius: 6px;
+  transition: all ease 0.3s;
+}
+#Portfolio .row .item:hover {
+  transform: scale(1.03);
+}
+#Portfolio .row .item img {
+  width: 100%;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  border-bottom:3px solid rgb(60, 88, 101);
+  display: block;
+}
+
+#Portfolio .row .item-content {
+  padding: 20px 15px 30px;
+  background-color: #b7b417ed;
+}
+
+a {
+  text-decoration: none;
+  color: white;
+}
+
+
+
+#Portfolio .row .item-content p{
+  font-size: 18px;
+}
+
+
+#Portfolio .row .item-content h3 {
+  font-size: 25px;
+  color: black;
+  margin-bottom: 10px;
+}
+#Portfolio .row .item-content a {
+  font-size: 14px;
+  text-decoration: none;
+  color: var(--secondary-color);
+  font-weight: bold;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ========== الشاشات الكبيرة (ديسكتوب) ========== */
+@media (max-width: 1250px) {
+  .extra-info {
+    display: none; /* نخفيها عشان ما تبهدلش الشكل */
+  }
+
+
+}
+
+/* ========== الأجهزة المتوسطة (تابلت) ========== */
+@media (max-width: 900px) {
+  .extra-info {
+    display: none; /* لسه مخفي */
+  }
+
+
+   .imge{
+    width: 100px;
+   }
+
+  .booking-cta {
+    font-size: 18px;
+    padding: 10px 20px;
+    white-space: nowrap; /* الكلمة ما تتقسمش */
+    display: inline-block;
+    text-align: center;
+  }
+}
+
+
+
+@media (min-width: 580px) and (max-width:605px) {
+
+
+  .imge{
+   position: relative;
+   top: 20px;
+   left: 50%;
+
+  }
+}
+
+
+/* ========== لما الشاشة تبقى صغيرة نخلي العناصر عمود واحد ========== */
+@media (max-width: 768px) {
+  #Portfolio .row {
+    grid-template-columns: 1fr; /* عمود واحد */
+  }
+
+.extra-info {
+  display: none;
+  background: #222;
+  color: #eee;
+  padding: 30px;
+  font-weight: bold;
+  border-radius: 30px;
+  max-width: 80%;
+  margin: 60px auto 0;
+  text-align: center;
+  display: block;
+  position: relative;
+
+
+}
+
+
+.sectio-divider {
+  display: block;
+  border: none;
+  height: 8px;
+  background: #94c10b;
+  margin: 20px auto;
+  width: 100%;
+  border-radius: 50px;
+}
+
+
+
+
+
+
+}
+
+
+/* ========== الأجهزة الصغيرة (موبايل) ========== */
+@media (max-width: 600px) {
+  .booking-cta {
+    font-size: 16px;
+    padding: 8px 18px;
+    white-space: nowrap;
+    display: inline-block;
+  }
+
+
+
+
+  .imge{
+   position: relative;
+   bottom: 50px;
+   left: 65%;
+   width: 120px;
+
+
+  }
+
+  .content{
+    position: relative;
+    top: 100px;
+  }
+
+
+.toggle-switch {
+  position: relative;
+  right: 40px;
+  bottom:  20px;
+  width: 90px;
+}
+
+.cta-button{
+  font-size: 18px;
+  font-weight: bold;
+  position: relative;
+  left: 20px;
+}
+
+
+
+
+
+}
+
+
+
+
+
+@media (max-width: 415px) {
+    .toggle-switch {
+  position: relative;
+  right: 40px;
+  bottom:  20px;
+  width: 95px;
+}
+
+
+
+}
+
+
+
+
+
+/* ========== أصغر شاشات (موبايل قديم 320px) ========== */
+@media (max-width: 320px) {
+  .booking-cta {
+    font-size: 14px; /* نصغر الخط */
+    padding: 6px 12px; /* نقلل البادينج */
+    white-space: nowrap; /* نخلي الكلمة على سطر واحد */
+    display: inline-block;
+  }
+}
+
+@media (max-width: 395px) {
+    .toggle-switch {
+  position: relative;
+  right: 40px;
+  bottom:  20px;
+  width: 105px;
+}
+
+}
+
+
+
+
